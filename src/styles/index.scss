@@ -1,0 +1,53 @@
+:root {
+	--background-one: #ffffff;
+	--background-two: hsl(250, 37%, 97%);
+
+	--line: hsl(234, 25%, 88%);
+	--dots: hsl(240, 21%, 88%);
+
+	--foreground-one: #000000;
+	--foreground-two: #9796a1;
+
+	--accent-one: #3936c8;
+	--dark-accent-one: #221fc3;
+
+	--accent-two: #00b2b2;
+	--dark-accent-two: #00a6a6;
+
+	--header-height: 5rem;
+}
+
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+}
+
+html,
+body,
+input,
+button {
+	color: var(--foreground-one);
+	font-family: "Poppins", sans-serif;
+	font-size: 16px;
+	letter-spacing: 0.25px;
+}
+
+input,
+button {
+	background: none;
+	border: none;
+	outline: none;
+}
+
+#root > main {
+	height: calc(100vh - var(--header-height));
+	padding: 1rem;
+	padding-top: unset;
+	background-color: var(--background-one);
+}
+
+// Poppins
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap");

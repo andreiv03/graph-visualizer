@@ -1,0 +1,85 @@
+.bottom_bar {
+	position: fixed;
+	left: 50%;
+	transform: translateX(-50%);
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	animation: slide_up 500ms 3000ms forwards;
+
+	button {
+		padding: 0.75rem;
+		cursor: pointer;
+		transition: 50ms ease-in;
+
+		&:hover {
+			background-color: var(--background-two);
+
+			svg {
+				color: var(--accent-one);
+			}
+		}
+
+		svg {
+			font-size: 1.25rem;
+			display: block;
+			transition: 50ms ease-in;
+		}
+	}
+
+	.tooltip {
+		padding: 0.75rem 2rem;
+		white-space: nowrap;
+
+		h4 {
+			font-size: 0.875rem;
+			font-weight: 500;
+		}
+	}
+
+	button,
+	.tooltip {
+		background-color: var(--background-one);
+		border: 1px solid var(--line);
+		border-bottom-style: unset;
+		border-top-left-radius: 0.5rem;
+		border-top-right-radius: 0.5rem;
+	}
+}
+
+.overlay {
+	position: fixed;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	z-index: 1;
+	height: 1rem;
+	background-color: var(--background-one);
+}
+
+@keyframes slide_up {
+	0% {
+		bottom: -2rem;
+	}
+
+	100% {
+		bottom: 1rem;
+	}
+}
+
+@media screen and (max-width: 475px) {
+	.bottom_bar {
+		flex-wrap: wrap;
+		justify-content: center;
+
+		button {
+			border-style: solid;
+			border-radius: 0.5rem;
+			order: 1;
+		}
+
+		.tooltip {
+			order: 2;
+		}
+	}
+}
