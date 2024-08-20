@@ -1,9 +1,9 @@
 :root {
 	--background-one: #ffffff;
-	--background-two: hsl(250, 37%, 97%);
+	--background-two: #f5f5fa;
 
-	--line: hsl(234, 25%, 88%);
-	--dots: hsl(240, 21%, 88%);
+	--line: #d9dae8;
+	--dots: #dadae7;
 
 	--foreground-one: #000000;
 	--foreground-two: #9796a1;
@@ -42,10 +42,9 @@ button {
 	outline: none;
 }
 
-#root > main {
-	height: calc(100vh - var(--header-height));
+#root {
+	height: 100vh;
 	padding: 1rem;
-	padding-top: unset;
 	background-color: var(--background-one);
 }
 

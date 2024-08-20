@@ -1,11 +1,11 @@
 .bottom_bar {
 	position: fixed;
+	bottom: -4rem;
 	left: 50%;
 	transform: translateX(-50%);
 	display: flex;
-	align-items: center;
 	gap: 0.5rem;
-	animation: slide_up 500ms 3000ms forwards;
+	animation: slide_up 750ms 3000ms forwards;
 
 	button {
 		padding: 0.75rem;
@@ -20,6 +20,18 @@
 			}
 		}
 
+		&:disabled {
+			cursor: not-allowed;
+
+			&:hover {
+				background-color: var(--background-two);
+
+				svg {
+					color: var(--foreground-two);
+				}
+			}
+		}
+
 		svg {
 			font-size: 1.25rem;
 			display: block;
@@ -30,6 +42,18 @@
 	.tooltip {
 		padding: 0.75rem 2rem;
 		white-space: nowrap;
+
+		&.algorithm {
+			cursor: pointer;
+
+			&:hover {
+				background-color: var(--background-two);
+
+				h4 {
+					color: var(--accent-one);
+				}
+			}
+		}
 
 		h4 {
 			font-size: 0.875rem;
@@ -47,19 +71,9 @@
 	}
 }
 
-.overlay {
-	position: fixed;
-	right: 0;
-	bottom: 0;
-	left: 0;
-	z-index: 1;
-	height: 1rem;
-	background-color: var(--background-one);
-}
-
 @keyframes slide_up {
 	0% {
-		bottom: -2rem;
+		bottom: -4rem;
 	}
 
 	100% {

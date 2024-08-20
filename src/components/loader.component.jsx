@@ -3,21 +3,19 @@ import { useSystemContext } from "../contexts/system.context";
 import styles from "../styles/components/loader.module.scss";
 
 const Loader = () => {
-	const systemContext = useSystemContext();
+	const { isLoaderVisible, setIsLoaderVisible } = useSystemContext();
 
 	useEffect(() => {
-		const timer = setTimeout(() => systemContext.setIsLoaderVisible(false), 3000);
+		const timer = setTimeout(() => setIsLoaderVisible(false), 3000);
 		return () => clearTimeout(timer);
-	}, []);
+	}, [setIsLoaderVisible]);
+
+	if (!isLoaderVisible) return null;
 
 	return (
-		<>
-			{systemContext.isLoaderVisible ? (
-				<div className={styles.container}>
-					<div className={styles.loader} />
-				</div>
-			) : null}
-		</>
+		<div className={styles.container}>
+			<div className={styles.loader} />
+		</div>
 	);
 };
 

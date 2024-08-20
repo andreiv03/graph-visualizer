@@ -1,18 +1,21 @@
 .header {
-	position: relative;
-	height: var(--header-height);
-	padding: 0 1rem;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	overflow: hidden;
+	position: fixed;
+	top: -4rem;
+	left: 50%;
+	transform: translateX(-50%);
+	padding: 0.5rem 4rem 1rem;
+	background-color: var(--background-one);
+	border: 1px solid var(--line);
+	border-top-style: unset;
+	border-bottom-left-radius: 0.5rem;
+	border-bottom-right-radius: 0.5rem;
+	animation: slide_down 750ms forwards;
 
-	.actions {
-		position: absolute;
-		top: 50%;
-		left: 50%;
-		z-index: 0;
-		transform: translate(-50%, -50%);
+	&.hidden {
+		animation: slide_up 750ms forwards;
+	}
+
+	.content {
 		display: flex;
 		gap: 0.5rem;
 
@@ -49,26 +52,24 @@
 			}
 		}
 	}
+}
 
-	.algorithm {
-		position: absolute;
-		top: 50%;
-		left: 50%;
-		transform: translate(-50%, -50%);
-		width: max-content;
-		margin: 0 auto;
-		padding: 0.5rem 1rem;
-		border: 2px solid var(--line);
-		border-radius: 0.5rem;
-		color: var(--accent-two);
-		font-size: 0.875rem;
-		font-weight: 600;
-		text-transform: uppercase;
-		cursor: pointer;
+@keyframes slide_down {
+	0% {
+		top: -4rem;
+	}
 
-		&:hover {
-			background-color: var(--background-two);
-			color: var(--dark-accent-two);
-		}
+	100% {
+		top: 1rem;
+	}
+}
+
+@keyframes slide_up {
+	0% {
+		top: 1rem;
+	}
+
+	100% {
+		top: -4rem;
 	}
 }

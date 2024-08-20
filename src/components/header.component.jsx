@@ -6,220 +6,172 @@ import {
 	PiPencilCircleDuotone,
 	PiPlusCircleDuotone
 } from "react-icons/pi";
-import { motion, AnimatePresence } from "framer-motion";
+
 import { useSystemContext } from "../contexts/system.context";
 import styles from "../styles/components/header.module.scss";
 
+const getNextNodeId = (existingIds) => {
+	let id = 1;
+	while (existingIds.includes(id)) id = id + 1;
+	return id;
+};
+
+const getNextNodeLabel = (existingLabels) => {
+	const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+	return alphabet.split("").find((letter) => !existingLabels.includes(letter)) || null;
+};
+
 const Header = () => {
-	const systemContext = useSystemContext();
+	const { action, setAction, isGraphDirected, setIsGraphDirected, isLoaderVisible, network, page } =
+		useSystemContext();
 
 	useEffect(() => {
-		if (!systemContext.network || systemContext.step !== 1) return;
-		systemContext.network.unselectAll();
+		if (!network || page !== 1) return;
+		network.unselectAll();
 
-		switch (systemContext.action) {
-			case "NAVIGATING":
-				systemContext.network.fit();
-				systemContext.network.setOptions({
-					interaction: { dragNodes: true, dragView: true, selectable: true, zoomView: true }
-				});
-				break;
+		const interactionOptions = {
+			NAVIGATING: { dragNodes: true, dragView: true, selectable: true, zoomView: true },
+			ADDING_NODE: { dragNodes: false, dragView: false, selectable: false, zoomView: false },
+			ADDING_EDGE: { dragNodes: false, dragView: false, selectable: false, zoomView: false },
+			EDITING_EDGE: { dragNodes: false, dragView: false, selectable: true, zoomView: false },
+			DELETING: { dragNodes: false, dragView: false, selectable: true, zoomView: false }
+		};
 
-			case "ADDING_NODE":
-				systemContext.network.on("click", handleAddNode);
-				systemContext.network.setOptions({
-					interaction: { dragNodes: false, dragView: false, selectable: false, zoomView: false }
-				});
-				break;
+		const actionHandlers = {
+			NAVIGATING: () => network.fit(),
+			ADDING_NODE: () => network.on("click", addNode),
+			ADDING_EDGE: () => {
+				network.addEdgeMode();
+				network.on("controlNodeDragEnd", addEdge);
+			},
+			EDITING_EDGE: () => network.on("selectEdge", editEdge),
+			DELETING: () => {
+				network.on("selectNode", deleteNode);
+				network.on("selectEdge", deleteEdge);
+			}
+		};
 
-			case "ADDING_EDGE":
-				systemContext.network.addEdgeMode();
-				systemContext.network.on("controlNodeDragEnd", handleAddEdge);
-				systemContext.network.setOptions({
-					interaction: { dragNodes: false, dragView: false, selectable: false, zoomView: false }
-				});
-				break;
-
-			case "EDITING_NODE":
-				systemContext.network.on("selectNode", handleEditNode);
-				systemContext.network.setOptions({
-					interaction: { dragNodes: false, dragView: false, selectable: true, zoomView: false }
-				});
-				break;
-
-			case "EDITING_EDGE":
-				systemContext.network.on("selectEdge", handleEditEdge);
-				systemContext.network.setOptions({
-					interaction: { dragNodes: false, dragView: false, selectable: true, zoomView: false }
-				});
-				break;
-
-			case "DELETING":
-				systemContext.network.on("selectNode", handleDeleteNode);
-				systemContext.network.on("selectEdge", handleDeleteEdge);
-				systemContext.network.setOptions({
-					interaction: { dragNodes: false, dragView: false, selectable: true, zoomView: false }
-				});
-				break;
-
-			default:
-				break;
+		if (actionHandlers[action]) {
+			actionHandlers[action]();
+			network.setOptions({ interaction: interactionOptions[action] });
 		}
 
 		return () => {
-			systemContext.network.disableEditMode();
-			systemContext.network.off("click", handleAddNode);
-			systemContext.network.off("controlNodeDragEnd", handleAddEdge);
-			systemContext.network.off("selectNode", handleEditNode);
-			systemContext.network.off("selectEdge", handleEditEdge);
-			systemContext.network.off("selectNode", handleDeleteNode);
-			systemContext.network.off("selectEdge", handleDeleteEdge);
+			network.disableEditMode();
+			network.off("click", addNode);
+			network.off("controlNodeDragEnd", addEdge);
+			network.off("selectEdge", editEdge);
+			network.off("selectNode", deleteNode);
+			network.off("selectEdge", deleteEdge);
 		};
-	}, [systemContext.action]);
+	}, [action, network, page]);
 
-	const handleAddNode = (params) => {
-		if (systemContext.action !== "ADDING_NODE") return;
+	const addNode = (params) => {
+		if (action !== "ADDING_NODE") return;
 
-		const nodeId = "node-" + Math.random().toString(36).substr(2, 7);
-		systemContext.network.body.data.nodes.add({
-			id: nodeId,
-			label: nodeId,
-			x: params.pointer.canvas.x,
-			y: params.pointer.canvas.y
-		});
+		const existingNodes = network.body.data.nodes.get();
+		const existingIds = existingNodes.map((node) => parseInt(node.id, 10));
+		const existingLabels = existingNodes.map((node) => node.label);
+
+		const id = getNextNodeId(existingIds).toString();
+		const label = getNextNodeLabel(existingLabels);
+
+		const { x, y } = params.pointer.canvas;
+		network.body.data.nodes.add({ id, label, x, y });
 	};
 
-	const handleAddEdge = () => {
-		if (systemContext.action !== "ADDING_EDGE") return;
-		systemContext.network.addEdgeMode();
+	const addEdge = () => {
+		if (action !== "ADDING_EDGE") return;
+		network.addEdgeMode();
 	};
 
-	const handleEditNode = (params) => {
-		if (systemContext.action !== "EDITING_NODE") return;
+	const editEdge = (params) => {
+		if (action !== "EDITING_EDGE") return;
 
-		const node = systemContext.network.body.data.nodes.get(params.nodes[0]);
-		const label = window.prompt("Enter a new label for the node:", node.label);
-		systemContext.network.body.data.nodes.update({
-			id: params.nodes[0],
-			label: label ? label : node.label
-		});
-	};
+		const edge = network.body.data.edges.get(params.edges[0]);
+		const label = window.prompt("Enter a new cost for the edge between -99 and 99:", edge.label);
 
-	const handleEditEdge = (params) => {
-		if (systemContext.action !== "EDITING_EDGE") return;
+		if (isNaN(label) || label === null || label === "" || label <= -100 || label >= 100) {
+			network.body.data.edges.remove(params.edges[0]);
+			network.body.data.edges.add({
+				id: edge.id,
+				from: edge.from,
+				to: edge.to
+			});
+			return;
+		}
 
-		const edge = systemContext.network.body.data.edges.get(params.edges[0]);
-		const label = window.prompt("Enter a new cost for the edge:", edge.label);
-		if (isNaN(label)) return;
-
-		systemContext.network.body.data.edges.update({
+		network.body.data.edges.update({
 			id: params.edges[0],
-			label: label ? label : edge.label
+			label
 		});
 	};
 
-	const handleDeleteNode = (params) => {
-		if (systemContext.action !== "DELETING") return;
-		if (systemContext.network.getConnectedEdges(params.nodes[0]).length === 0)
-			systemContext.network.deleteSelected();
+	const deleteNode = (params) => {
+		if (action !== "DELETING") return;
+		if (network.getConnectedEdges(params.nodes[0]).length !== 0) return;
+		network.deleteSelected();
 	};
 
-	const handleDeleteEdge = () => {
-		if (systemContext.action !== "DELETING") return;
-		systemContext.network.deleteSelected();
+	const deleteEdge = () => {
+		if (action !== "DELETING") return;
+		network.deleteSelected();
 	};
 
-	const handleSwitchType = () => {
-		if (systemContext.step !== 1) return;
-
-		systemContext.setIsGraphDirected(!systemContext.isGraphDirected);
-		systemContext.network.setOptions({
+	const switchGraphType = () => {
+		network.setOptions({
 			edges: {
 				arrows: {
-					to: { enabled: !systemContext.isGraphDirected, scaleFactor: 1 }
+					to: { enabled: !isGraphDirected, scaleFactor: 1 }
 				}
 			}
 		});
+		setIsGraphDirected(!isGraphDirected);
 	};
 
 	return (
-		<header className={styles.header}>
-			<AnimatePresence>
-				{systemContext.step === 1 ? (
-					<motion.div
-						className={styles.actions}
-						key="actions"
-						initial={{ opacity: 0, x: "calc(-50% - 300px)", y: "-50%" }}
-						animate={{ opacity: 1, x: "-50%", y: "-50%" }}
-						exit={{ opacity: 0, x: "calc(-50% + 300px)", y: "-50%" }}
-						transition={{ duration: 0.5, stiffness: 50, type: "spring" }}
-					>
-						<button
-							className={systemContext.action === "NAVIGATING" ? styles.active_one : ""}
-							onClick={() => systemContext.setAction("NAVIGATING")}
-						>
-							<PiNavigationArrowDuotone />
-						</button>
+		<header className={`${styles.header} ${isLoaderVisible || page !== 1 ? styles.hidden : ""}`}>
+			<div className={styles.content}>
+				<button
+					className={action === "NAVIGATING" ? styles.active_one : ""}
+					onClick={() => setAction("NAVIGATING")}
+				>
+					<PiNavigationArrowDuotone />
+				</button>
 
-						<button
-							className={
-								systemContext.action === "ADDING_NODE"
-									? styles.active_one
-									: systemContext.action === "ADDING_EDGE"
-									? styles.active_two
-									: ""
-							}
-							onClick={() =>
-								systemContext.action !== "ADDING_NODE"
-									? systemContext.setAction("ADDING_NODE")
-									: systemContext.setAction("ADDING_EDGE")
-							}
-						>
-							<PiPlusCircleDuotone />
-						</button>
+				<button
+					className={
+						action === "ADDING_NODE"
+							? styles.active_one
+							: action === "ADDING_EDGE"
+							? styles.active_two
+							: ""
+					}
+					onClick={() =>
+						action !== "ADDING_NODE" ? setAction("ADDING_NODE") : setAction("ADDING_EDGE")
+					}
+				>
+					<PiPlusCircleDuotone />
+				</button>
 
-						<button
-							className={
-								systemContext.action === "EDITING_NODE"
-									? styles.active_one
-									: systemContext.action === "EDITING_EDGE"
-									? styles.active_two
-									: ""
-							}
-							onClick={() =>
-								systemContext.action !== "EDITING_NODE"
-									? systemContext.setAction("EDITING_NODE")
-									: systemContext.setAction("EDITING_EDGE")
-							}
-						>
-							<PiPencilCircleDuotone />
-						</button>
+				<button
+					className={action === "EDITING_EDGE" ? styles.active_one : ""}
+					onClick={() => setAction("EDITING_EDGE")}
+				>
+					<PiPencilCircleDuotone />
+				</button>
 
-						<button
-							className={systemContext.action === "DELETING" ? styles.active_one : ""}
-							onClick={() => systemContext.setAction("DELETING")}
-						>
-							<PiMinusCircleDuotone />
-						</button>
+				<button
+					className={action === "DELETING" ? styles.active_one : ""}
+					onClick={() => setAction("DELETING")}
+				>
+					<PiMinusCircleDuotone />
+				</button>
 
-						<button onClick={handleSwitchType}>
-							<PiGraphDuotone />
-						</button>
-					</motion.div>
-				) : systemContext.step === 2 ? (
-					<motion.div
-						className={styles.algorithm}
-						key="algorithm"
-						onClick={systemContext.debouncedHandleToggleGrid}
-						initial={{ opacity: 0, x: "calc(-50% - 300px)", y: "-50%" }}
-						animate={{ opacity: 1, x: "-50%", y: "-50%" }}
-						exit={{ opacity: 0, x: "calc(-50% + 300px)", y: "-50%" }}
-						transition={{ duration: 0.5, stiffness: 50, type: "spring" }}
-					>
-						Choose an algorithm
-					</motion.div>
-				) : null}
-			</AnimatePresence>
+				<button onClick={switchGraphType}>
+					<PiGraphDuotone />
+				</button>
+			</div>
 		</header>
 	);
 };

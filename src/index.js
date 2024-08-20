@@ -15,10 +15,8 @@ root.render(
 		<SystemContextProvider>
 			<Loader />
 			<AlgorithmsGrid />
+			<NetworkGraph />
 			<Header />
-			<main>
-				<NetworkGraph />
-			</main>
 			<BottomBar />
 		</SystemContextProvider>
 	</React.StrictMode>
