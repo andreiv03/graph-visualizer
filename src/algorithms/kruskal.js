@@ -5,7 +5,7 @@ const kruskal = (graph) => {
 	const steps = [];
 	const visited = new Set();
 
-	graph.nodes.forEach((node) => (parent[node.id] = node.id), (rank[node.id] = 0));
+	graph.nodes.forEach((node) => ((parent[node.id] = node.id), (rank[node.id] = 0)));
 
 	const find = (node) => {
 		if (parent[node] !== node) parent[node] = find(parent[node]);

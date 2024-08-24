@@ -4,7 +4,7 @@ const dijkstra = (graph) => {
 	const steps = [];
 	const visited = new Set();
 
-	graph.nodes.forEach((node) => (distances[node.id] = Infinity), (path[node.id] = null));
+	graph.nodes.forEach((node) => ((distances[node.id] = Infinity), (path[node.id] = null)));
 
 	const startNode = graph.nodes.getIds()[0];
 	const queue = [startNode];
