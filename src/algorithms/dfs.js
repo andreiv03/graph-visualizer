@@ -1,51 +1,40 @@
+import { createStepLogger } from "../utils/helpers";
+
 const dfs = (graph, isGraphDirected) => {
-	const path = {};
 	const steps = [];
+	const path = {};
 	const visited = new Set();
 
-	graph.nodes.forEach((node) => (path[node.id] = null));
+	const nodes = graph.nodes.get();
+	const edges = graph.edges.get();
+	const nodeIds = graph.nodes.getIds();
+	const logStep = createStepLogger({ steps, path, visited });
 
-	const dfsRecursive = (node) => {
-		visited.add(node);
-
-		steps.push({
-			edge: null,
-			node,
-			path: { ...path },
-			visited: new Set([...visited])
-		});
-
-		graph.edges
-			.get({
-				filter: (edge) =>
-					isGraphDirected ? edge.from === node : edge.from === node || edge.to === node
-			})
-			.forEach((edge) => {
-				const neighbour = edge.from === node ? edge.to : edge.from;
-				if (!visited.has(neighbour)) {
-					path[neighbour] = edge.id;
-
-					steps.push({
-						edge: edge.id,
-						node: neighbour,
-						path: { ...path },
-						visited: new Set([...visited])
-					});
-
-					dfsRecursive(neighbour);
-				}
-			});
-	};
-
-	dfsRecursive(graph.nodes.getIds()[0]);
-
-	steps.push({
-		edge: null,
-		node: null,
-		path: { ...path },
-		visited: new Set([...visited])
+	nodes.forEach(({ id }) => {
+		path[id] = null;
 	});
 
+	const dfsRecursive = (nodeId) => {
+		visited.add(nodeId);
+		logStep({ node: nodeId });
+
+		const neighbors = edges.filter((edge) => {
+			return isGraphDirected ? edge.from === nodeId : edge.from === nodeId || edge.to === nodeId;
+		});
+
+		neighbors.forEach((edge) => {
+			const neighborId = edge.from === nodeId ? edge.to : edge.from;
+
+			if (!visited.has(neighborId)) {
+				path[neighborId] = edge.id;
+				logStep({ edge: edge.id, node: neighborId });
+				dfsRecursive(neighborId);
+			}
+		});
+	};
+
+	dfsRecursive(nodeIds[0]);
+	logStep({});
 	return steps;
 };
 

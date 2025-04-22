@@ -1,23 +1,35 @@
-import React from "react";
-import ReactDOM from "react-dom/client";
-import { SystemContextProvider } from "./contexts/system.context";
+import { StrictMode, useState } from "react";
+import { createRoot } from "react-dom/client";
 
-import "./styles/index.scss";
-import Loader from "./components/loader.component";
-import AlgorithmsGrid from "./components/algorithms-grid.component";
-import Header from "./components/header.component";
-import NetworkGraph from "./components/network-graph.component";
-import BottomBar from "./components/bottom-bar.component";
+import { NetworkProvider } from "./contexts/network-context";
 
-const root = ReactDOM.createRoot(document.getElementById("root"));
-root.render(
-	<React.StrictMode>
-		<SystemContextProvider>
-			<Loader />
-			<AlgorithmsGrid />
+import AlgorithmsGrid from "./components/algorithms-grid";
+import BottomBar from "./components/bottom-bar";
+import Header from "./components/header";
+import Loader from "./components/loader";
+import NetworkGraph from "./components/network-graph";
+import "./styles/globals.scss";
+
+function App() {
+	const [isAlgorithmsGridVisible, setIsAlgorithmsGridVisible] = useState(false);
+	const [isLoaderVisible, setIsLoaderVisible] = useState(true);
+
+	return (
+		<NetworkProvider>
+			<Loader isLoaderVisible={isLoaderVisible} setIsLoaderVisible={setIsLoaderVisible} />
 			<NetworkGraph />
-			<Header />
-			<BottomBar />
-		</SystemContextProvider>
-	</React.StrictMode>
+			<Header isLoaderVisible={isLoaderVisible} />
+			<BottomBar setIsAlgorithmsGridVisible={setIsAlgorithmsGridVisible} />
+			<AlgorithmsGrid
+				isAlgorithmsGridVisible={isAlgorithmsGridVisible}
+				setIsAlgorithmsGridVisible={setIsAlgorithmsGridVisible}
+			/>
+		</NetworkProvider>
+	);
+}
+
+createRoot(document.getElementById("root")).render(
+	<StrictMode>
+		<App />
+	</StrictMode>,
 );

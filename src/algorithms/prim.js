@@ -1,60 +1,53 @@
+import { createStepLogger } from "../utils/helpers";
+
 const prim = (graph) => {
-	const minimumSpanningTree = {};
 	const steps = [];
+	const mstEdges = {};
 	const visited = new Set();
 
-	graph.nodes.forEach((node) => (minimumSpanningTree[node.id] = null));
+	const nodes = graph.nodes.get();
+	const edges = graph.edges.get();
+	const nodeIds = graph.nodes.getIds();
+	const logStep = createStepLogger({ steps, path: mstEdges, visited });
 
-	const startNode = graph.nodes.getIds()[0];
-	const queue = [startNode];
+	const startNode = nodeIds[0];
+	mstEdges[startNode] = null;
 	visited.add(startNode);
 
-	steps.push({
-		edge: null,
-		node: startNode,
-		path: { ...minimumSpanningTree },
-		visited: new Set([...visited])
-	});
+	logStep({ node: startNode });
 
-	while (queue.length > 0) {
-		let currentEdge = null;
-		let currentNode = null;
+	while (visited.size < nodes.length) {
+		let minEdge = null;
+		let nextNode = null;
 
-		graph.edges
-			.get({
-				filter: (edge) =>
-					(visited.has(edge.from) && !visited.has(edge.to)) ||
-					(visited.has(edge.to) && !visited.has(edge.from))
-			})
-			.forEach((edge) => {
-				const neighbour = visited.has(edge.from) ? edge.to : edge.from;
-				if (!visited.has(neighbour))
-					if (currentEdge === null || parseFloat(edge.label) < parseFloat(currentEdge.label))
-						(currentEdge = edge), (currentNode = neighbour);
-			});
+		for (const edge of edges) {
+			const { from, to, label } = edge;
+			const fromVisited = visited.has(from);
+			const toVisited = visited.has(to);
 
-		if (!currentEdge || !currentNode) break;
+			if (fromVisited !== toVisited) {
+				const neighbor = fromVisited ? to : from;
+				const weight = parseFloat(label);
 
-		minimumSpanningTree[currentNode] = currentEdge.id;
-		visited.add(currentNode);
+				if (!visited.has(neighbor)) {
+					if (!minEdge || weight < parseFloat(minEdge.label)) {
+						minEdge = edge;
+						nextNode = neighbor;
+					}
+				}
+			}
+		}
 
-		steps.push({
-			edge: currentEdge.id,
-			node: currentNode,
-			path: { ...minimumSpanningTree },
-			visited: new Set([...visited])
-		});
+		if (!minEdge || !nextNode) {
+			break;
+		}
 
-		queue.push(currentNode);
+		mstEdges[nextNode] = minEdge.id;
+		visited.add(nextNode);
+		logStep({ edge: minEdge.id, node: nextNode });
 	}
 
-	steps.push({
-		edge: null,
-		node: null,
-		path: { ...minimumSpanningTree },
-		visited: new Set([...visited])
-	});
-
+	logStep({});
 	return steps;
 };
 

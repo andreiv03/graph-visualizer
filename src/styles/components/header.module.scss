@@ -27,20 +27,12 @@
 			cursor: pointer;
 			transition: 50ms ease-in;
 
-			&.active_one,
+			&.active,
 			&:hover {
 				border-color: var(--accent-one);
 
 				svg {
 					color: var(--accent-one);
-				}
-			}
-
-			&.active_two {
-				border-color: var(--accent-two);
-
-				svg {
-					color: var(--accent-two);
 				}
 			}
 

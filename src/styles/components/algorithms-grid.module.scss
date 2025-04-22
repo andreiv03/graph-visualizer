@@ -8,9 +8,9 @@
 	height: calc(100% - 2rem - 200px);
 	margin: 1rem;
 	padding: 2rem;
-	background-color: var(--background-two);
 	border: 1px solid var(--line);
 	border-radius: 0.5rem;
+	background-color: var(--background-two);
 	display: grid;
 	grid-template-columns: repeat(2, 1fr);
 	gap: 1rem;
@@ -23,9 +23,9 @@
 	}
 
 	.card {
-		background-color: var(--background-one);
 		border: 1px solid var(--line);
 		border-radius: 0.5rem;
+		background-color: var(--background-one);
 		display: flex;
 		flex-direction: column;
 		justify-content: space-between;
@@ -47,8 +47,8 @@
 				bottom: 0;
 				left: 0;
 				z-index: 1;
-				background-color: rgba(0, 0, 0, 0.1);
 				border-radius: 0.5rem;
+				background-color: rgba(0, 0, 0, 0.1);
 			}
 		}
 
@@ -87,8 +87,8 @@
 
 				span {
 					padding: 0.25rem 0.75rem;
-					background-color: var(--accent-two);
 					border-radius: 0.25rem;
+					background-color: var(--accent-two);
 					color: var(--background-one);
 					font-size: 0.75rem;
 					font-weight: 600;
@@ -99,10 +99,10 @@
 			.choose_algorithm {
 				width: 100%;
 				padding: 0.5rem 0;
-				background-color: var(--background-two);
 				border-top: 1px solid var(--line);
 				border-bottom-left-radius: 0.5rem;
 				border-bottom-right-radius: 0.5rem;
+				background-color: var(--background-two);
 				font-size: 0.875rem;
 				font-weight: 600;
 				text-transform: uppercase;

@@ -1,49 +1,62 @@
+import { createStepLogger } from "../utils/helpers";
+
 const kruskal = (graph) => {
-	const minimumSpanningTree = [];
+	const steps = [];
+	const mstEdges = [];
+	const visited = new Set();
 	const parent = {};
 	const rank = {};
-	const steps = [];
-	const visited = new Set();
 
-	graph.nodes.forEach((node) => ((parent[node.id] = node.id), (rank[node.id] = 0)));
-
-	const find = (node) => {
-		if (parent[node] !== node) parent[node] = find(parent[node]);
-		return parent[node];
-	};
-
-	const union = (from, to) => {
-		const rootFrom = find(from);
-		const rootTo = find(to);
-		if (rootFrom !== rootTo) parent[rootTo] = rootFrom;
-	};
-
+	const nodes = graph.nodes.get();
 	const edges = graph.edges.get().sort((a, b) => parseFloat(a.label) - parseFloat(b.label));
+	const logStep = createStepLogger({ steps, path: mstEdges, visited });
+
+	nodes.forEach(({ id }) => {
+		parent[id] = id;
+		rank[id] = 0;
+	});
+
+	const find = (nodeId) => {
+		if (parent[nodeId] !== nodeId) {
+			parent[nodeId] = find(parent[nodeId]);
+		}
+
+		return parent[nodeId];
+	};
+
+	const union = (a, b) => {
+		const rootA = find(a);
+		const rootB = find(b);
+
+		if (rootA === rootB) {
+			return;
+		}
+
+		if (rank[rootA] < rank[rootB]) {
+			parent[rootA] = rootB;
+		} else if (rank[rootA] > rank[rootB]) {
+			parent[rootB] = rootA;
+		} else {
+			parent[rootB] = rootA;
+			rank[rootA]++;
+		}
+	};
 
 	for (const edge of edges) {
-		if (find(edge.from) !== find(edge.to)) {
-			minimumSpanningTree.push(edge.id);
-			union(edge.from, edge.to);
+		const { from, to, id } = edge;
 
-			visited.add(edge.from);
-			visited.add(edge.to);
+		if (find(from) !== find(to)) {
+			mstEdges.push(id);
+			union(from, to);
 
-			steps.push({
-				edge: edge.id,
-				node: [edge.from, edge.to],
-				path: [...minimumSpanningTree],
-				visited: new Set([...visited])
-			});
+			visited.add(from);
+			visited.add(to);
+
+			logStep({ edge: id, node: to });
 		}
 	}
 
-	steps.push({
-		edge: null,
-		node: null,
-		path: [...minimumSpanningTree],
-		visited: new Set([...visited])
-	});
-
+	logStep({});
 	return steps;
 };
 

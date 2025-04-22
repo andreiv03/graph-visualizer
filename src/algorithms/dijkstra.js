@@ -1,62 +1,62 @@
+import { createStepLogger } from "../utils/helpers";
+
 const dijkstra = (graph) => {
 	const distances = {};
 	const path = {};
 	const steps = [];
 	const visited = new Set();
 
-	graph.nodes.forEach((node) => ((distances[node.id] = Infinity), (path[node.id] = null)));
+	const nodes = graph.nodes.get();
+	const edges = graph.edges.get();
+	const nodeIds = graph.nodes.getIds();
+	const logStep = createStepLogger({ steps, path, visited });
 
-	const startNode = graph.nodes.getIds()[0];
-	const queue = [startNode];
-	distances[startNode] = 0;
+	const startNode = nodeIds[0];
 
-	while (queue.length > 0) {
-		const node = queue.reduce(
-			(smallestNode, node) => (distances[node] < distances[smallestNode] ? node : smallestNode),
-			queue[0]
-		);
-
-		queue.splice(queue.indexOf(node), 1);
-		visited.add(node);
-
-		steps.push({
-			edge: null,
-			node,
-			path: { ...path },
-			visited: new Set([...visited])
-		});
-
-		graph.edges
-			.get({
-				filter: (edge) => edge.from === node || edge.to === node
-			})
-			.forEach((edge) => {
-				const neighbour = edge.from === node ? edge.to : edge.from;
-				if (visited.has(neighbour)) return;
-
-				steps.push({
-					edge: edge.id,
-					node,
-					path: { ...path },
-					visited: new Set([...visited])
-				});
-
-				const distance = distances[node] + parseFloat(edge.label);
-				if (distance < distances[neighbour]) {
-					distances[neighbour] = distance;
-					path[neighbour] = edge.id;
-					if (!queue.includes(neighbour)) queue.push(neighbour);
-				}
-			});
-	}
-
-	steps.push({
-		edge: null,
-		node: null,
-		path: { ...path },
-		visited: new Set([...visited])
+	nodes.forEach(({ id }) => {
+		distances[id] = Infinity;
+		path[id] = null;
 	});
 
+	distances[startNode] = 0;
+	const queue = [startNode];
+
+	while (queue.length > 0) {
+		const currentNode = queue.reduce((minNode, n) =>
+			distances[n] < distances[minNode] ? n : minNode,
+		);
+
+		queue.splice(queue.indexOf(currentNode), 1);
+		visited.add(currentNode);
+		logStep({ node: currentNode });
+
+		const connectedEdges = edges.filter(
+			(edge) => edge.from === currentNode || edge.to === currentNode,
+		);
+
+		for (const edge of connectedEdges) {
+			const neighbor = edge.from === currentNode ? edge.to : edge.from;
+			if (visited.has(neighbor)) {
+				continue;
+			}
+
+			logStep({ edge: edge.id, node: currentNode });
+
+			const edgeWeight = parseFloat(edge.label);
+			const nextDistance = distances[currentNode] + edgeWeight;
+
+			if (nextDistance < distances[neighbor]) {
+				distances[neighbor] = nextDistance;
+				path[neighbor] = edge.id;
+
+				if (!queue.includes(neighbor)) {
+					queue.push(neighbor);
+				}
+			}
+		}
+	}
+
+	logStep({});
 	return steps;
 };
 

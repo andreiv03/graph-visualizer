@@ -9,12 +9,7 @@
 	--foreground-two: #9796a1;
 
 	--accent-one: #3936c8;
-	--dark-accent-one: #221fc3;
-
 	--accent-two: #00b2b2;
-	--dark-accent-two: #00a6a6;
-
-	--header-height: 5rem;
 }
 
 *,
@@ -47,6 +42,3 @@ button {
 	padding: 1rem;
 	background-color: var(--background-one);
 }
-
-// Poppins
-@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap");
