@@ -36,7 +36,7 @@ Before installing the project, ensure you have the following installed:
 
 ### Installation Instructions
 
-Follow these steps to clone, build, and run the rock, paper, scissors game:
+Follow these steps to clone, build, and run the graph visualizer app:
 ```sh
 # Clone the repository
 git clone https://github.com/andreiv03/graph-visualizer.git
