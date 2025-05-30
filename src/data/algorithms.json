@@ -3,28 +3,28 @@
 		"name": "Dijkstra",
 		"description": "Dijkstra's algorithm is an algorithm for finding the shortest paths between nodes in a graph.",
 		"tags": ["graph", "shortest path", "positive weights"],
-		"complexity": "O(V^2)",
-		"conditions": ["non-negative weights", "weighted graph", "connected graph", "undirected graph"]
+		"complexity": "O(V^2) or O((V+E) * log(V))",
+		"conditions": ["non-negative weights", "weighted graph", "connected graph"]
 	},
 	{
 		"name": "DFS",
 		"description": "Depth-First Search (DFS) is an algorithm for traversing or searching tree or graph data structures.",
 		"tags": ["graph", "traversal", "search"],
 		"complexity": "O(V+E)",
-		"conditions": ["unweighted graph", "connected graph"]
+		"conditions": ["connected graph"]
 	},
 	{
 		"name": "Prim",
 		"description": "Prim's algorithm is a greedy algorithm that finds a minimum spanning tree for a weighted undirected graph.",
 		"tags": ["graph", "minimum spanning tree"],
-		"complexity": "O(V^2)",
+		"complexity": "O(V^2) or O((V+E) * log(V))",
 		"conditions": ["non-negative weights", "weighted graph", "connected graph", "undirected graph"]
 	},
 	{
 		"name": "Kruskal",
 		"description": "Kruskal's algorithm is a greedy algorithm that finds a minimum spanning tree for a connected weighted graph.",
 		"tags": ["graph", "minimum spanning tree"],
-		"complexity": "O(E*log(E))",
+		"complexity": "O(E * log(E))",
 		"conditions": ["weighted graph", "connected graph", "undirected graph"]
 	}
 ]

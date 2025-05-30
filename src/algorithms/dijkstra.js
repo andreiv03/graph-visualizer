@@ -1,6 +1,6 @@
 import { createStepLogger } from "../utils/helpers";
 
-const dijkstra = (graph) => {
+const dijkstra = (graph, isGraphDirected) => {
 	const distances = {};
 	const path = {};
 	const steps = [];
@@ -30,12 +30,15 @@ const dijkstra = (graph) => {
 		visited.add(currentNode);
 		logStep({ node: currentNode });
 
-		const connectedEdges = edges.filter(
-			(edge) => edge.from === currentNode || edge.to === currentNode,
-		);
+		const connectedEdges = edges.filter((edge) => {
+			return isGraphDirected
+				? edge.from === currentNode
+				: edge.from === currentNode || edge.to === currentNode;
+		});
 
 		for (const edge of connectedEdges) {
 			const neighbor = edge.from === currentNode ? edge.to : edge.from;
+
 			if (visited.has(neighbor)) {
 				continue;
 			}
