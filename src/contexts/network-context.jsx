@@ -19,6 +19,9 @@ const reducer = (state, action) => {
 		case "SET_ALGORITHM":
 			return { ...state, algorithm: action.payload };
 
+		case "SET_ALGORITHM_INDEX":
+			return { ...state, algorithm: { ...state.algorithm, index: action.payload } };
+
 		case "TOGGLE_GRAPH_DIRECTED":
 			return { ...state, isGraphDirected: action.payload };
 
@@ -89,6 +92,22 @@ export function NetworkProvider({ children }) {
 		[state.isGraphDirected, state.network],
 	);
 
+	const setAlgorithmIndex = useCallback(
+		(index) => {
+			if (!state.algorithm.steps.length) {
+				return;
+			}
+
+			if (index < 0 || index >= state.algorithm.steps.length) {
+				return;
+			}
+
+			visualizeAlgorithmStep(state.network, { ...state.algorithm, index });
+			dispatch({ type: "SET_ALGORITHM_INDEX", payload: index });
+		},
+		[state.algorithm, state.network],
+	);
+
 	const toggleGraphDirected = useCallback(() => {
 		state.network.setOptions({
 			edges: {
@@ -139,26 +158,28 @@ export function NetworkProvider({ children }) {
 			return;
 		}
 
-		const interval = setInterval(() => {
-			const { index, steps } = state.algorithm;
-
-			if (index >= steps.length) {
-				clearInterval(interval);
-				return;
-			}
-
-			visualizeAlgorithmStep(state.network, state.algorithm);
-			dispatch({ type: "SET_ALGORITHM", payload: { ...state.algorithm, index: index + 1 } });
-		}, 1000);
-
-		return () => {
-			clearInterval(interval);
-		};
-	}, [state.algorithm, state.network, state.page]);
+		visualizeAlgorithmStep(state.network, state.algorithm);
+	}, [state.page, state.network, state.algorithm]);
 
 	const contextValue = useMemo(
-		() => ({ state, initializeNetwork, setAction, setAlgorithm, toggleGraphDirected, updatePage }),
-		[state, initializeNetwork, setAction, setAlgorithm, toggleGraphDirected, updatePage],
+		() => ({
+			state,
+			initializeNetwork,
+			setAction,
+			setAlgorithm,
+			setAlgorithmIndex,
+			toggleGraphDirected,
+			updatePage,
+		}),
+		[
+			state,
+			initializeNetwork,
+			setAction,
+			setAlgorithm,
+			setAlgorithmIndex,
+			toggleGraphDirected,
+			updatePage,
+		],
 	);
 
 	return <NetworkContext.Provider value={contextValue}>{children}</NetworkContext.Provider>;

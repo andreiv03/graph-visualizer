@@ -115,6 +115,32 @@
 				}
 			}
 		}
+
+		.failed_conditions {
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+			z-index: 1;
+			padding: 1rem 1.5rem;
+			border: 1px solid var(--line);
+			border-radius: 0.5rem;
+			background-color: var(--background-one);
+			white-space: nowrap;
+
+			h5 {
+				font-size: 1rem;
+				font-weight: 600;
+			}
+
+			ul {
+				list-style: none;
+
+				li {
+					font-size: 0.875rem;
+				}
+			}
+		}
 	}
 }
 

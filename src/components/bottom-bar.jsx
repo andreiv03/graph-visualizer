@@ -1,5 +1,8 @@
-import { useEffect, useState } from "react";
-import { PiArrowCircleLeftDuotone, PiArrowCircleRightDuotone } from "react-icons/pi";
+import {
+	PiArrowCircleLeftDuotone,
+	PiArrowCircleRightDuotone,
+	PiArrowClockwiseDuotone,
+} from "react-icons/pi";
 
 import { NetworkContext } from "../contexts/network-context";
 import { useContextHook } from "../hooks/use-context-hook";
@@ -7,14 +10,30 @@ import { useContextHook } from "../hooks/use-context-hook";
 import styles from "../styles/components/bottom-bar.module.scss";
 
 export default function BottomBar({ setIsAlgorithmsGridVisible }) {
-	const { state, updatePage } = useContextHook(NetworkContext);
-	const [isAlgorithmFinished, setIsAlgorithmFinished] = useState(false);
+	const { state, setAlgorithmIndex, updatePage } = useContextHook(NetworkContext);
 
-	useEffect(() => {
-		const { index, steps } = state.algorithm;
-		const isFinished = steps.length && index >= steps.length;
-		setIsAlgorithmFinished(isFinished);
-	}, [state.algorithm]);
+	const isLeftArrowDisabled = state.page === 3 ? state.algorithm.index <= 0 : state.page <= 1;
+
+	const isRightArrowDisabled =
+		state.page === 3
+			? state.algorithm.index >= state.algorithm.steps.length - 1
+			: state.page >= 3 || (state.page === 2 && !state.algorithm.name);
+
+	const handleLeftArrow = () => {
+		if (state.page === 3) {
+			setAlgorithmIndex(state.algorithm.index - 1);
+		} else {
+			updatePage(state.page - 1);
+		}
+	};
+
+	const handleRightArrow = () => {
+		if (state.page === 3) {
+			setAlgorithmIndex(state.algorithm.index + 1);
+		} else {
+			updatePage(state.page + 1);
+		}
+	};
 
 	const getTooltipContext = () => {
 		switch (state.page) {
@@ -24,14 +43,14 @@ export default function BottomBar({ setIsAlgorithmsGridVisible }) {
 			case 2:
 				return `Algorithm: ${state.algorithm.name !== "" ? state.algorithm.name : "None"}`;
 
-			default:
-				return "Visualizing...";
+			case 3:
+				return `Algorithm step: ${state.algorithm.index + 1}/${state.algorithm.steps.length}`;
 		}
 	};
 
 	return (
 		<div className={styles.bottom_bar}>
-			<button disabled={state.page <= 1} onClick={() => updatePage(state.page - 1)}>
+			<button disabled={isLeftArrowDisabled} onClick={handleLeftArrow}>
 				<PiArrowCircleLeftDuotone />
 			</button>
 
@@ -39,14 +58,18 @@ export default function BottomBar({ setIsAlgorithmsGridVisible }) {
 				className={`${styles.tooltip} ${state.page === 2 ? styles.algorithm : ""}`}
 				onClick={() => state.page === 2 && setIsAlgorithmsGridVisible(true)}
 			>
-				<h4>{isAlgorithmFinished ? "The algorithm has finished" : getTooltipContext()}</h4>
+				<h4>{getTooltipContext()}</h4>
 			</div>
 
-			<button
-				disabled={state.page >= 3 || (state.page === 2 && !state.algorithm.name)}
-				onClick={() => updatePage(state.page + 1)}
-			>
+			<button disabled={isRightArrowDisabled} onClick={handleRightArrow}>
 				<PiArrowCircleRightDuotone />
+			</button>
+
+			<button
+				className={`${styles.reset} ${state.page === 3 ? styles.visible : ""}`}
+				onClick={() => updatePage(1)}
+			>
+				<PiArrowClockwiseDuotone />
 			</button>
 		</div>
 	);

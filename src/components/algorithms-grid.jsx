@@ -12,8 +12,8 @@ export default function AlgorithmsGrid({ isAlgorithmsGridVisible, setIsAlgorithm
 
 	const conditions = getGraphConditions(state.network, state.isGraphDirected);
 
-	const isAlgorithmValid = (algorithm) =>
-		algorithm.conditions.every((condition) => conditions[condition]?.());
+	const getFailedConditions = (algorithm) =>
+		algorithm.conditions.filter((condition) => !conditions[condition]?.());
 
 	const selectAlgorithm = (algorithm) => {
 		setAlgorithm(algorithm);
@@ -42,30 +42,45 @@ export default function AlgorithmsGrid({ isAlgorithmsGridVisible, setIsAlgorithm
 						exit={{ opacity: 0, x: "calc(-50% - 1rem)", y: "calc(-50% + 200px)" }}
 						transition={{ duration: 0.5, type: "spring" }}
 					>
-						{algorithms.map((algorithm) => (
-							<button
-								className={styles.card}
-								key={algorithm.name}
-								disabled={!isAlgorithmValid(algorithm)}
-								onClick={() => selectAlgorithm(algorithm)}
-							>
-								<div className={styles.details}>
-									<h3>{algorithm.name}</h3>
-									<h4>{algorithm.complexity}</h4>
-									<p>{algorithm.description}</p>
-								</div>
+						{algorithms.map((algorithm) => {
+							const failedConditions = getFailedConditions(algorithm);
 
-								<div className={styles.row}>
-									<div className={styles.tags}>
-										{algorithm.tags.map((tag) => (
-											<span key={tag}>{tag}</span>
-										))}
+							return (
+								<button
+									className={styles.card}
+									key={algorithm.name}
+									disabled={failedConditions.length > 0}
+									onClick={() => selectAlgorithm(algorithm)}
+								>
+									<div className={styles.details}>
+										<h3>{algorithm.name}</h3>
+										<h4>{algorithm.complexity}</h4>
+										<p>{algorithm.description}</p>
 									</div>
 
-									<div className={styles.choose_algorithm}>Choose algorithm</div>
-								</div>
-							</button>
-						))}
+									<div className={styles.row}>
+										<div className={styles.tags}>
+											{algorithm.tags.map((tag) => (
+												<span key={tag}>{tag}</span>
+											))}
+										</div>
+
+										<div className={styles.choose_algorithm}>Choose algorithm</div>
+									</div>
+
+									{failedConditions.length > 0 && (
+										<div className={styles.failed_conditions}>
+											<h5>Failed conditions</h5>
+											<ul>
+												{failedConditions.map((condition) => (
+													<li key={condition}>{condition}</li>
+												))}
+											</ul>
+										</div>
+									)}
+								</button>
+							);
+						})}
 					</motion.div>
 				</>
 			)}

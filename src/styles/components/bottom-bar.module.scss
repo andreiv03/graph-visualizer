@@ -37,6 +37,14 @@
 			display: block;
 			transition: 50ms ease-in;
 		}
+
+		&.reset {
+			display: none;
+
+			&.visible {
+				display: block;
+			}
+		}
 	}
 
 	.tooltip {
