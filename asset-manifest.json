@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/graph-visualizer/static/css/main.1cab9593.css",
+    "main.js": "/graph-visualizer/static/js/main.5abc9194.js",
+    "index.html": "/graph-visualizer/index.html",
+    "main.1cab9593.css.map": "/graph-visualizer/static/css/main.1cab9593.css.map",
+    "main.5abc9194.js.map": "/graph-visualizer/static/js/main.5abc9194.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.1cab9593.css",
+    "static/js/main.5abc9194.js"
+  ]
+}
