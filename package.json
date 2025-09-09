@@ -4,7 +4,9 @@
 	"homepage": "https://andreiv03.github.io/graph-visualizer/",
 	"scripts": {
 		"build": "react-scripts build",
-		"start": "react-scripts start"
+		"start": "react-scripts start",
+		"predeploy": "npm run build",
+		"deploy": "gh-pages -d build"
 	},
 	"dependencies": {
 		"framer-motion": "^12.4.10",
@@ -15,6 +17,7 @@
 		"vis-network": "^9.1.9"
 	},
 	"devDependencies": {
+		"gh-pages": "^6.3.0",
 		"sass": "^1.85.1"
 	},
 	"browserslist": {
